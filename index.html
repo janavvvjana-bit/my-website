@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Service | Ремонт бытовой техники</title>
+    <!-- Шрифты и иконки -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0f172a;
+            --primary-gold: #b8860b;
+            --secondary-gold: #daa520;
+            --cream: #f8f5f0;
+            --deep-ebony: #0a0c14;
+            --marble: #f0ece5;
+            --border-gold: rgba(184, 134, 11, 0.25);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream);
+            color: var(--primary-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Кнопка входа для администратора */
+        .admin-login-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-dark);
+            border: 2px solid var(--primary-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-gold);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .admin-login-trigger:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        /* Модальное окно входа */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .login-modal {
+            background: var(--cream);
+            padding: 50px;
+            border-radius: 30px;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            border: 3px solid var(--primary-gold);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .login-modal {
+            transform: translateY(0);
+        }
+
+        .login-modal h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary-gold);
+            padding-bottom: 15px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-gold);
+            background: white;
+            font-size: 16px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 4px rgba(184, 134, 11, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-dark);
+            color: var(--primary-gold);
+            border: 2px solid var(--primary-gold);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--primary-dark);
+            transition: 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            background: rgba(0,0,0,0.05);
+            transform: rotate(90deg);
+        }
+
+        /* ===== САЙТ ДЛЯ КЛИЕНТА ===== */
+        .client-site {
+            display: block;
+        }
+
+        .client-site.hidden {
+            display: none;
+        }
+
+        /* Премиальный хедер */
+        .premium-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a1f2f 100%);
+            color: white;
+            padding: 20px 0;
+            border-bottom: 3px solid var(--primary-gold);
+            position: relative;
+            box-shadow: var(--shadow-md);
+        }
+
+        .premium-header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-gold), var(--secondary-gold), var(--primary-gold), transparent);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 48px;
+            color: var(--primary-gold);
+            filter: drop-shadow(0 0 10px rgba(184, 134, 11, 0.3));
+        }
+
+        .logo-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fff, var(--secondary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 14px;
+            color: var(--secondary-gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header-contact {
+            text-align: right;
+        }
+
+        .header-contact .phone {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-gold);
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Hero секция */
+        .hero {
+            padding: 100px 0;
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            border-bottom: 3px solid var(--primary-gold);
+        }
+
+        .hero-content {
+            max-width: 700px;
+        }
+
+        .hero h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 25px;
+        }
+
+        .hero h2 span {
+            color: var(--primary-gold);
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero h2 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-gold);
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #e0e0e0;
+        }
+
+        /* Категории услуг */
+        .categories {
+            padding: 80px 0;
+            background: var(--cream);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-gold), var(--secondary-gold), var(--primary-gold), transparent);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
+            margin-top: 60px;
+        }
+
+        .service-card {
+            background: white;
+            border: 2px solid var(--border-gold);
+            border-radius: 30px;
+            padding: 40px 30px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-gold), var(--secondary-gold));
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary-gold);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .service-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .service-icon {
+            font-size: 56px;
+            color: var(--primary-gold);
+            margin-bottom: 25px;
+        }
+
+        .service-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .service-price {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary-gold);
+            margin: 20px 0;
+            line-height: 1;
+        }
+
+        .service-price small {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .service-features {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .service-features li {
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-features i {
+            color: var(--primary-gold);
+            font-size: 14px;
+        }
+
+        /* Просмотр услуг (детальная карточка) */
+        .service-detail {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .service-detail.active {
+            display: flex;
+        }
+
+        .detail-card {
+            background: var(--cream);
+            border-radius: 40px;
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            border: 3px solid var(--primary-gold);
+            box-shadow: var(--shadow-lg);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .detail-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: white;
+            transition: 0.3s;
+        }
+
+        .detail-close:hover {
+            background: var(--primary-gold);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .detail-icon {
+            font-size: 80px;
+            color: var(--primary-gold);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .detail-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .detail-price {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-gold);
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .detail-features {
+            margin: 30px 0;
+        }
+
+        .detail-features h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .detail-features ul {
+            list-style: none;
+        }
+
+        .detail-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-features i {
+            color: var(--primary-gold);
+        }
+
+        .detail-book-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary-dark);
+            color: var(--primary-gold);
+            border: 2px solid var(--primary-gold);
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 50px;
+            margin-top: 30px;
+        }
+
+        .detail-book-btn:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+        }
+
+        /* Секция записи */
+        .booking {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f0ece5 0%, #e5ddd2 100%);
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+            margin-top: 50px;
+        }
+
+        .calendar {
+            background: white;
+            padding: 35px;
+            border-radius: 30px;
+            border: 2px solid var(--border-gold);
+            box-shadow: var(--shadow-md);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .calendar-day-name {
+            font-weight: 700;
+            color: var(--primary-gold);
+            padding: 10px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .calendar-day.available {
+            background: #e8f4e8;
+            color: #2c5f2d;
+            border: 2px solid #4caf50;
+        }
+
+        .calendar-day.available:hover {
+            background: #4caf50;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.booked {
+            background: #ffe8e8;
+            color: #c62828;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .calendar-day.selected {
+            background: var(--primary-gold);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3);
+        }
+
+        .booking-form {
+            background: white;
+            padding: 45px;
+            border-radius: 30px;
+            border: 2px solid var(--border-gold);
+            box-shadow: var(--shadow-md);
+        }
+
+        .booking-form h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border-gold);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 4px rgba(184, 134, 11, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-dark);
+            color: var(--primary-gold);
+            border: 2px solid var(--primary-gold);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 50px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(184, 134, 11, 0.2);
+        }
+
+        /* Админ панель (стили из предыдущей версии, оптимизированные) */
+        .admin-site {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a1f2f 100%);
+        }
+
+        .admin-site.active {
+            display: block;
+        }
+
+        .admin-header {
+            background: var(--deep-ebony);
+            padding: 20px 0;
+            border-bottom: 3px solid var(--primary-gold);
+        }
+
+        .admin-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+        }
+
+        .admin-logout {
+            padding: 12px 35px;
+            background: transparent;
+            border: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .admin-logout:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+        }
+
+        .admin-dashboard {
+            padding: 40px 0;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+        }
+
+        .stat-card i {
+            font-size: 40px;
+            color: var(--primary-gold);
+            margin-bottom: 15px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid var(--border-gold);
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .admin-tab.active {
+            background: var(--primary-gold);
+            border-color: var(--primary-gold);
+            color: var(--primary-dark);
+        }
+
+        .admin-panel {
+            display: none;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--border-gold);
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-panel h2 {
+            color: var(--primary-gold);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 25px;
+        }
+
+        .workers-table, .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+        .workers-table th, .requests-table th {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid var(--primary-gold);
+            color: var(--primary-gold);
+        }
+
+        .workers-table td, .requests-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-gold);
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .status-approved {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            margin: 0 5px;
+            border: 1px solid var(--primary-gold);
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 1024px) {
+            .booking-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+            .hero h2 {
+                font-size: 42px;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка входа в админку -->
+    <div class="admin-login-trigger" id="adminTrigger">
+        <i class="fas fa-user-shield"></i>
+    </div>
+
+    <!-- Модальное окно входа -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2>Вход для администратора</h2>
+            <input type="password" class="login-input" placeholder="Введите пароль" id="adminPassword">
+            <button class="login-btn" id="loginBtn">Войти в панель</button>
+            <p style="margin-top: 20px; color: #666; font-size: 14px; text-align: center;">Пароль: admin123</p>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра услуги -->
+    <div class="service-detail" id="serviceDetail">
+        <div class="detail-card" id="detailContent">
+            <!-- Контент будет заполняться динамически -->
+        </div>
+    </div>
+
+    <!-- Сайт для клиента -->
+    <div class="client-site" id="clientSite">
+        <header class="premium-header">
+            <div class="container header-content">
+                <div class="logo">
+                    <i class="fas fa-tools logo-icon"></i>
+                    <div class="logo-text">
+                        <h1>Premium Service</h1>
+                        <p>РЕМОНТ БЫТОВОЙ ТЕХНИКИ</p>
+                    </div>
+                </div>
+                <div class="header-contact">
+                    <div class="phone">+7 (495) 777-88-99</div>
+                    <p>Ежедневно 09:00 - 21:00</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>Профессиональный ремонт<br><span>бытовой техники</span></h2>
+                    <p>Опытные мастера, оригинальные запчасти, гарантия до 2 лет. Ремонтируем технику любых брендов и сложности.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="categories">
+            <div class="container">
+                <h2 class="section-title">Наши услуги</h2>
+                <div class="services-grid" id="servicesGrid">
+                    <!-- Услуги будут добавлены через JS -->
+                </div>
+            </div>
+        </section>
+
+        <section class="booking">
+            <div class="container">
+                <h2 class="section-title">Запись на ремонт</h2>
+                <div class="booking-grid">
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <h3>Март 2026</h3>
+                            <div>
+                                <button class="action-btn" style="color: var(--primary-dark);" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                                <button class="action-btn" style="color: var(--primary-dark);" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="calendar-grid" id="calendar">
+                            <!-- Календарь генерируется JS -->
+                        </div>
+                    </div>
+                    <div class="booking-form">
+                        <h3>Оставить заявку</h3>
+                        <form id="bookingForm">
+                            <div class="form-group">
+                                <label>Выберите услугу</label>
+                                <select class="form-control" id="serviceSelect" required>
+                                    <option value="">Выберите...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ваше имя</label>
+                                <input type="text" class="form-control" id="clientName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Телефон</label>
+                                <input type="tel" class="form-control" id="clientPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Выбранная дата</label>
+                                <input type="text" class="form-control" id="selectedDate" readonly placeholder="Сначала выберите дату">
+                            </div>
+                            <div class="form-group">
+                                <label>Комментарий</label>
+                                <textarea class="form-control" id="clientComment" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">Оставить заявку</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Админ панель -->
+    <div class="admin-site" id="adminSite">
+        <div class="admin-header">
+            <div class="container admin-header-content">
+                <div class="admin-logo">
+                    <i class="fas fa-user-shield" style="color: var(--primary-gold);"></i>
+                    <span>Admin Panel</span>
+                </div>
+                <button class="admin-logout" id="logoutBtn">Выйти</button>
+            </div>
+        </div>
+
+        <div class="container admin-dashboard">
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <i class="fas fa-tools"></i>
+                    <div class="stat-value" id="statWorkers">6</div>
+                    <div>Мастеров</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-value" id="statHours">342</div>
+                    <div>Часов за неделю</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-file-invoice"></i>
+                    <div class="stat-value" id="statRequests">12</div>
+                    <div>Заявок</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-ruble-sign"></i>
+                    <div class="stat-value" id="statSalary">285 000</div>
+                    <div>ФОТ за месяц</div>
+                </div>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="requests">Заявки</button>
+                <button class="admin-tab" data-tab="workers">Мастера</button>
+                <button class="admin-tab" data-tab="salary">Зарплата</button>
+                <button class="admin-tab" data-tab="reports">Отчеты</button>
+            </div>
+
+            <!-- Панель заявок -->
+            <div class="admin-panel active" id="requestsPanel">
+                <h2>Входящие заявки на ремонт</h2>
+                <table class="requests-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Клиент</th>
+                            <th>Услуга</th>
+                            <th>Дата</th>
+                            <th>Телефон</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsList">
+                        <!-- Заявки добавляются через JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Панель мастеров -->
+            <div class="admin-panel" id="workersPanel">
+                <h2>Управление мастерами</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="action-btn" onclick="showAddWorkerForm()">
+                        <i class="fas fa-plus"></i> Добавить мастера
+                    </button>
+                </div>
+                <table class="workers-table">
+                    <thead>
+                        <tr>
+                            <th>ФИО</th>
+                            <th>Специализация</th>
+                            <th>Часов за неделю</th>
+                            <th>Ставка/час</th>
+                            <th>Начислено</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workersList">
+                        <!-- Мастера добавляются через JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Панель зарплаты -->
+            <div class="admin-panel" id="salaryPanel">
+                <h2>Расчет заработной платы</h2>
+                <div class="salary-report" id="salaryReport">
+                    <!-- Расчет зарплаты через JS -->
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="action-btn" onclick="processSalary()">
+                        <i class="fas fa-money-bill"></i> Произвести выплату
+                    </button>
+                </div>
+            </div>
+
+            <!-- Панель отчетов -->
+            <div class="admin-panel" id="reportsPanel">
+                <h2>Отчеты</h2>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div class="stat-card" style="cursor: pointer;" onclick="generateReport('weekly')">
+                        <i class="fas fa-calendar-week"></i>
+                        <h3>Недельный отчет</h3>
+                        <p>Часы и зарплата за неделю</p>
+                    </div>
+                    <div class="stat-card" style="cursor: pointer;" onclick="generateReport('monthly')">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Месячный отчет</h3>
+                        <p>Полная статистика за месяц</p>
+                    </div>
+                </div>
+                <div id="reportResult" style="margin-top: 30px; color: white;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные
+        let services = [
+            { 
+                id: 1, 
+                name: 'Ремонт холодильников', 
+                price: 2500, 
+                icon: 'fa-snowflake', 
+                description: 'Профессиональный ремонт холодильников любых брендов. Выезд мастера на дом.',
+                features: ['Замена компрессора', 'Заправка фреоном', 'Ремонт электроники', 'Устранение утечек', 'Замена термостата', 'Диагностика 0₽'] 
+            },
+            { 
+                id: 2, 
+                name: 'Ремонт стиральных машин', 
+                price: 2200, 
+                icon: 'fa-soap', 
+                description: 'Быстрый и качественный ремонт стиральных машин с гарантией.',
+                features: ['Замена подшипников', 'Ремонт насоса', 'Замена ТЭНа', 'Ремонт электроники', 'Чистка и профилактика', 'Диагностика 0₽'] 
+            },
+            { 
+                id: 3, 
+                name: 'Ремонт посудомоечных машин', 
+                price: 2000, 
+                icon: 'fa-utensils', 
+                description: 'Ремонт посудомоечных машин любой сложности. Оригинальные запчасти.',
+                features: ['Замена насоса', 'Ремонт нагревателя', 'Замена клапана', 'Чистка фильтров', 'Устранение протечек', 'Диагностика 0₽'] 
+            },
+            { 
+                id: 4, 
+                name: 'Ремонт кофемашин', 
+                price: 3000, 
+                icon: 'fa-mug-hot', 
+                description: 'Ремонт кофемашин профессионального и домашнего уровня.',
+                features: ['Decalcification', 'Замена заварной группы', 'Ремонт помпы', 'Настройка автоматики', 'Замена уплотнителей', 'Диагностика 0₽'] 
+            }
+        ];
+
+        let workers = [
+            { id: 1, name: 'Иван Петров', specialization: 'Холодильники', hoursThisWeek: 42, rate: 1200, totalSalary: 50400 },
+            { id: 2, name: 'Алексей Смирнов', specialization: 'Стиральные машины', hoursThisWeek: 38, rate: 1100, totalSalary: 41800 },
+            { id: 3, name: 'Дмитрий Козлов', specialization: 'Кофемашины', hoursThisWeek: 45, rate: 1300, totalSalary: 58500 },
+            { id: 4, name: 'Михаил Иванов', specialization: 'Посудомойки', hoursThisWeek: 35, rate: 1150, totalSalary: 40250 }
+        ];
+
+        let requests = [
+            { id: 1, client: 'Елена Владимирова', service: 'Ремонт холодильников', date: '2026-03-15', phone: '+7 999 123-45-67', status: 'pending' },
+            { id: 2, client: 'Ольга Николаева', service: 'Ремонт кофемашин', date: '2026-03-16', phone: '+7 999 234-56-78', status: 'pending' },
+            { id: 3, client: 'Андрей Соколов', service: 'Ремонт стиральных машин', date: '2026-03-18', phone: '+7 999 345-67-89', status: 'approved' }
+        ];
+
+        let currentSelectedDate = '';
+
+        // Инициализация
+        function initServices() {
+            const grid = document.getElementById('servicesGrid');
+            const select = document.getElementById('serviceSelect');
+            
+            grid.innerHTML = services.map(service => `
+                <div class="service-card" onclick="showServiceDetail(${service.id})">
+                    <i class="fas ${service.icon} service-icon"></i>
+                    <h3>${service.name}</h3>
+                    <div class="service-price">${service.price.toLocaleString()} ₽ <small>/ час</small></div>
+                    <ul class="service-features">
+                        ${service.features.slice(0, 3).map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
+                    </ul>
+                    <p style="color: var(--primary-gold); margin-top: 15px; font-weight: 600;">Нажмите для деталей →</p>
+                </div>
+            `).join('');
+
+            select.innerHTML = '<option value="">Выберите услугу</option>' + 
+                services.map(s => `<option value="${s.id}">${s.name} - ${s.price}₽/час</option>`).join('');
+        }
+
+        // Просмотр детальной информации об услуге
+        window.showServiceDetail = function(serviceId) {
+            const service = services.find(s => s.id === serviceId);
+            const detailContent = document.getElementById('detailContent');
+            
+            detailContent.innerHTML = `
+                <span class="detail-close" onclick="closeServiceDetail()">&times;</span>
+                <div class="detail-icon">
+                    <i class="fas ${service.icon}"></i>
+                </div>
+                <h2>${service.name}</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 20px;">${service.description}</p>
+                <div class="detail-price">${service.price.toLocaleString()} ₽ <span style="font-size: 18px; color: #666;">/ час</span></div>
+                
+                <div class="detail-features">
+                    <h3>Что входит в услугу:</h3>
+                    <ul>
+                        ${service.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div style="background: #f5f5f5; padding: 20px; border-radius: 15px; margin: 20px 0;">
+                    <p><i class="fas fa-truck" style="color: var(--primary-gold);"></i> Выезд мастера: бесплатно</p>
+                    <p><i class="fas fa-clock" style="color: var(--primary-gold);"></i> Время работы: от 1 часа</p>
+                    <p><i class="fas fa-shield-alt" style="color: var(--primary-gold);"></i> Гарантия: до 2 лет</p>
+                </div>
+
+                <button class="detail-book-btn" onclick="selectServiceFromDetail(${service.id})">
+                    Записаться на ремонт
+                </button>
+            `;
+            
+            document.getElementById('serviceDetail').classList.add('active');
+        };
+
+        window.closeServiceDetail = function() {
+            document.getElementById('serviceDetail').classList.remove('active');
+        };
+
+        window.selectServiceFromDetail = function(serviceId) {
+            closeServiceDetail();
+            document.getElementById('serviceSelect').value = serviceId;
+            document.getElementById('selectedDate').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        function initCalendar() {
+            const calendar = document.getElementById('calendar');
+            let days = '';
+            const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            
+            daysOfWeek.forEach(day => {
+                days += `<div class="calendar-day-name">${day}</div>`;
+            });
+
+            for (let i = 1; i <= 31; i++) {
+                const isAvailable = i % 3 !== 0;
+                const isBooked = i % 3 === 0;
+                days += `<div class="calendar-day ${isAvailable ? 'available' : ''} ${isBooked ? 'booked' : ''}" onclick="selectDate(${i})">${i}</div>`;
+            }
+            
+            calendar.innerHTML = days;
+        }
+
+        window.selectDate = function(day) {
+            if (day % 3 === 0) {
+                alert('Эта дата уже занята');
+                return;
+            }
+            currentSelectedDate = `2026-03-${day.toString().padStart(2, '0')}`;
+            document.getElementById('selectedDate').value = currentSelectedDate;
+            
+            document.querySelectorAll('.calendar-day').forEach(el => {
+                el.classList.remove('selected');
+                if (el.textContent == day) {
+                    el.classList.add('selected');
+                }
+            });
+        };
+
+        // Обработка формы заявки
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const serviceId = document.getElementById('serviceSelect').value;
+            const service = services.find(s => s.id == serviceId);
+            
+            const newRequest = {
+                id: requests.length + 1,
+                client: document.getElementById('clientName').value,
+                service: service ? service.name : 'Не выбрано',
+                date: currentSelectedDate,
+                phone: document.getElementById('clientPhone').value,
+                status: 'pending'
+            };
+            
+            requests.push(newRequest);
+            alert('Заявка успешно отправлена! Ожидайте звонка мастера.');
+            this.reset();
+            document.getElementById('selectedDate').value = '';
+            currentSelectedDate = '';
+            
+            // Обновляем статистику в админке
+            updateAdminStats();
+        });
+
+        // Функции админки
+        function updateRequestsList() {
+            const list = document.getElementById('requestsList');
+            list.innerHTML = requests.map(req => `
+                <tr>
+                    <td>#${req.id}</td>
+                    <td>${req.client}</td>
+                    <td>${req.service}</td>
+                    <td>${req.date}</td>
+                    <td>${req.phone}</td>
+                    <td><span class="status-badge ${req.status === 'pending' ? 'status-pending' : 'status-approved'}">${req.status === 'pending' ? 'Ожидает' : 'Принята'}</span></td>
+                    <td>
+                        ${req.status === 'pending' ? 
+                            '<button class="action-btn" onclick="acceptRequest(' + req.id + ')">Принять</button>' : 
+                            '<button class="action-btn" onclick="completeRequest(' + req.id + ')">Завершить</button>'}
+                        <button class="action-btn" onclick="deleteRequest(' + req.id + ')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateWorkersList() {
+            const list = document.getElementById('workersList');
+            list.innerHTML = workers.map(w => `
+                <tr>
+                    <td>${w.name}</td>
+                    <td>${w.specialization}</td>
+                    <td>${w.hoursThisWeek} ч</td>
+                    <td>${w.rate} ₽</td>
+                    <td>${w.totalSalary.toLocaleString()} ₽</td>
+                    <td>
+                        <button class="action-btn" onclick="editWorker(${w.id})"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" onclick="deleteWorker(${w.id})"><i class="fas fa-user-minus"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateSalaryReport() {
+            const report = document.getElementById('salaryReport');
+            const total = workers.reduce((sum, w) => sum + w.totalSalary, 0);
+            
+            report.innerHTML = workers.map(w => `
+                <div class="salary-item">
+                    <span>${w.name} (${w.specialization})</span>
+                    <span>${w.hoursThisWeek} ч × ${w.rate} ₽ = ${w.totalSalary.toLocaleString()} ₽</span>
+                </div>
+            `).join('') + 
+            `<div class="salary-total">Итого к выплате: ${total.toLocaleString()} ₽</div>`;
+        }
+
+        function updateAdminStats() {
+            document.getElementById('statWorkers').textContent = workers.length;
+            document.getElementById('statHours').textContent = workers.reduce((sum, w) => sum + w.hoursThisWeek, 0);
+            document.getElementById('statRequests').textContent = requests.length;
+            document.getElementById('statSalary').textContent = workers.reduce((sum, w) => sum + w.totalSalary, 0).toLocaleString();
+        }
+
+        // Глобальные функции для админки
+        window.acceptRequest = function(id) {
+            const request = requests.find(r => r.id === id);
+            if (request) {
+                request.status = 'approved';
+                updateRequestsList();
+                alert(`Заявка #${id} принята в работу`);
+            }
+        };
+
+            window.completeRequest = function(id) {
+            requests = requests.filter(r => r.id !== id);
+            updateRequestsList();
+            updateAdminStats();
+            alert('Заявка завершена');
+        };
+
+        window.deleteRequest = function(id) {
+            if (confirm('Удалить заявку?')) {
+                requests = requests.filter(r => r.id !== id);
+                updateRequestsList();
+                updateAdminStats();
+            }
+        };
+
+        window.showAddWorkerForm = function() {
+            const name = prompt('Введите ФИО мастера:');
+            if (!name) return;
+            
+            const spec = prompt('Введите специализацию:');
+            if (!spec) return;
+            
+            const rate = prompt('Введите ставку за час:');
+            if (!rate) return;
+            
+            const newWorker = {
+                id: workers.length + 1,
+                name: name,
+                specialization: spec,
+                hoursThisWeek: 0,
+                rate: parseInt(rate),
+                totalSalary: 0
+            };
+            
+            workers.push(newWorker);
+            updateWorkersList();
+            updateSalaryReport();
+            updateAdminStats();
+        };
+
+        window.editWorker = function(id) {
+            const worker = workers.find(w => w.id === id);
+            const newHours = prompt('Введите количество часов за неделю:', worker.hoursThisWeek);
+            if (newHours !== null) {
+                worker.hoursThisWeek = parseInt(newHours);
+                worker.totalSalary = worker.hoursThisWeek * worker.rate;
+                updateWorkersList();
+                updateSalaryReport();
+                updateAdminStats();
+            }
+        };
+
+        window.deleteWorker = function(id) {
+            if (confirm('Уволить мастера?')) {
+                workers = workers.filter(w => w.id !== id);
+                updateWorkersList();
+                updateSalaryReport();
+                updateAdminStats();
+            }
+        };
+
+        window.processSalary = function() {
+            alert('Зарплата выплачена. Отправлены ведомости в банк.');
+            workers.forEach(w => {
+                w.totalSalary = 0;
+                w.hoursThisWeek = 0;
+            });
+            updateWorkersList();
+            updateSalaryReport();
+            updateAdminStats();
+        };
+
+        window.generateReport = function(type) {
+            const reportDiv = document.getElementById('reportResult');
+            const totalHours = workers.reduce((sum, w) => sum + w.hoursThisWeek, 0);
+            const totalSalary = workers.reduce((sum, w) => sum + w.totalSalary, 0);
+            
+            if (type === 'weekly') {
+                reportDiv.innerHTML = `
+                    <h3 style="color: var(--primary-gold);">Отчет за неделю</h3>
+                    <p>Всего отработано часов: ${totalHours}</p>
+                    <p>Средняя нагрузка: ${Math.round(totalHours / workers.length)} ч/человек</p>
+                    <p>ФОТ за неделю: ${totalSalary.toLocaleString()} ₽</p>
+                    <p>Количество заявок: ${requests.length}</p>
+                `;
+            } else {
+                const monthlySalary = totalSalary * 4;
+                reportDiv.innerHTML = `
+                    <h3 style="color: var(--primary-gold);">Отчет за месяц</h3>
+                    <p>Прогноз часов за месяц: ${totalHours * 4}</p>
+                    <p>Прогноз ФОТ за месяц: ${monthlySalary.toLocaleString()} ₽</p>
+                    <p>Средний чек: ${Math.round(monthlySalary / (requests.length || 1))} ₽</p>
+                    <p>Всего заявок за период: ${requests.length}</p>
+                `;
+            }
+        };
+
+        // Переключение табов в админке
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const panelId = this.dataset.tab + 'Panel';
+                document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+
+        // Авторизация
+        const adminTrigger = document.getElementById('adminTrigger');
+        const loginModal = document.getElementById('loginModal');
+        const closeModal = document.getElementById('closeModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const adminPassword = document.getElementById('adminPassword');
+        const clientSite = document.getElementById('clientSite');
+        const adminSite = document.getElementById('adminSite');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        adminTrigger.addEventListener('click', () => {
+            loginModal.classList.add('active');
+        });
+
+        closeModal.addEventListener('click', () => {
+            loginModal.classList.remove('active');
+        });
+
+        loginBtn.addEventListener('click', () => {
+            if (adminPassword.value === 'admin123') {
+                loginModal.classList.remove('active');
+                clientSite.classList.add('hidden');
+                adminSite.classList.add('active');
+                
+                // Обновляем данные в админке
+                updateRequestsList();
+                updateWorkersList();
+                updateSalaryReport();
+                updateAdminStats();
+            } else {
+                alert('Неверный пароль');
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            adminSite.classList.remove('active');
+            clientSite.classList.remove('hidden');
+        });
+
+        // Закрытие модалки по клику на оверлей
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+            }
+        });
+
+        // Закрытие детального просмотра
+        document.getElementById('serviceDetail').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeServiceDetail();
+            }
+        });
+
+        // Инициализация при загрузке
+        initServices();
+        initCalendar();
+        updateAdminStats();
+
+        // Обработка клавиши Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeServiceDetail();
+                loginModal.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
